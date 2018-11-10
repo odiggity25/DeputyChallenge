@@ -1,7 +1,8 @@
-package com.orrie.deputychallenge
+package com.orrie.deputychallenge.views
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.orrie.deputychallenge.R
 
 class ShiftsActivity : AppCompatActivity() {
 
