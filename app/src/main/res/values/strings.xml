@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">DeputyChallenge</string>
+    <string name="start_time">Start: %s</string>
+    <string name="end_time">End: %s</string>
+    <string name="past_shifts">Past Shifts</string>
 </resources>
