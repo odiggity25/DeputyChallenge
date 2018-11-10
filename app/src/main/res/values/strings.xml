@@ -4,4 +4,14 @@
     <string name="end_time">End: %s</string>
     <string name="past_shifts">Past Shifts</string>
     <string name="add_shift">Add Shift</string>
+    <string name="current_shift">Current Shift</string>
+    <string name="shift_in_progress">Shift In Progress</string>
+    <string name="shift_in_progress_explanation">You can\'t start a new shift while you have a shift in progress. Please
+        finish the current shift first by tapping on it
+    </string>
+    <string name="start_shift">Start Shift</string>
+    <string name="start_shift_explanation">Would you like to start your shift with the current time and location?
+    </string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

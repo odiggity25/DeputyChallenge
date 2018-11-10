@@ -1,6 +1,7 @@
 package com.orrie.deputychallenge.views
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Build
@@ -21,6 +22,8 @@ import com.orrie.deputychallenge.viewmodels.ShiftsViewModel
 import kotlinx.android.synthetic.main.activity_shifts.*
 import javax.inject.Inject
 
+private const val REQUEST_PERMISSION_LOCATION = 1221
+
 class ShiftsActivity : BaseActivity() {
 
     @Inject
@@ -31,6 +34,8 @@ class ShiftsActivity : BaseActivity() {
 
     lateinit var shiftsViewModel: ShiftsViewModel
 
+    private var alertDialog: AlertDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shifts)
@@ -39,12 +44,9 @@ class ShiftsActivity : BaseActivity() {
         initUi()
     }
 
-    private val REQUEST_PERMISSION_LOCATION = 1221
-
     private fun initUi() {
         setSupportActionBar(shiftsToolbar)
         supportActionBar?.title = "Deputy Challenge"
-
 
         shiftsViewModel = ShiftsViewModel(shiftsRepository, locationManager, exits)
 
@@ -53,12 +55,52 @@ class ShiftsActivity : BaseActivity() {
         shiftsRecyclerView.layoutManager = LinearLayoutManager(this)
         shiftsRecyclerView.addItemDecoration(ItemSpacer())
 
+        shiftsAdapter.shiftClicks.subscribeAndObserveOnMainThread { shiftsViewModel.shiftClicked(it) }
+
         shiftsViewModel.shiftsUpdates.subscribeAndObserveOnMainThread { shiftsAdapter.updateShifts(it) }
         shiftsViewModel.requestLocationPermissionShows.subscribeAndObserveOnMainThread {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_PERMISSION_LOCATION)
             }
         }
+        shiftsViewModel.loadVisibilityChanges.subscribeAndObserveOnMainThread {
+            shiftsProgressBar.visibility = if (it) View.VISIBLE else View.GONE
+        }
+        shiftsViewModel.cantStartNewShiftWhileShiftInProgressErrorShows.subscribeAndObserveOnMainThread { showCantStartNewShiftDialog() }
+        shiftsViewModel.shiftStartConfirms.subscribeAndObserveOnMainThread { showNewShiftConfirmationDialog() }
+        shiftsViewModel.shiftEndConfirms.subscribeAndObserveOnMainThread { showEndShiftConfirmationDialog() }
+    }
+
+    private fun showCantStartNewShiftDialog() {
+        alertDialog?.dismiss()
+        alertDialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.shift_in_progress))
+            .setMessage(getString(R.string.shift_in_progress_explanation))
+            .setPositiveButton("OK", null)
+            .create()
+        alertDialog?.show()
+    }
+
+    private fun showNewShiftConfirmationDialog() {
+        alertDialog?.dismiss()
+        alertDialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.start_shift))
+            .setMessage(getString(R.string.start_shift_explanation))
+            .setPositiveButton(getString(R.string.ok)) { _, _ -> shiftsViewModel.addShift() }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .create()
+        alertDialog?.show()
+    }
+
+    private fun showEndShiftConfirmationDialog() {
+        alertDialog?.dismiss()
+        alertDialog = AlertDialog.Builder(this)
+            .setTitle("End Shift")
+            .setMessage("Would you like to end this shift?")
+            .setPositiveButton(getString(R.string.ok)) { _, _ -> shiftsViewModel.endShift() }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .create()
+        alertDialog?.show()
     }
 
     private class ItemSpacer : RecyclerView.ItemDecoration() {
@@ -83,11 +125,11 @@ class ShiftsActivity : BaseActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            if (requestCode == REQUEST_PERMISSION_LOCATION) {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    shiftsViewModel.addShiftClicked()
-                }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_PERMISSION_LOCATION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                shiftsViewModel.addShiftClicked()
             }
         }
+    }
 }

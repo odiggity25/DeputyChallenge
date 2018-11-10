@@ -7,13 +7,29 @@ import com.orrie.deputychallenge.R
 import com.orrie.deputychallenge.models.Shift
 import com.orrie.deputychallenge.views.ShiftHeaderView
 import com.orrie.deputychallenge.views.ShiftView
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 
 class ShiftsAdapter(private val context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var adapterItems: List<AdapterItem> = listOf()
 
-    fun updateShifts(shifts: List<Shift>) {
+    private val shiftClicksSubject = PublishSubject.create<Shift>()
+    val shiftClicks: Observable<Shift> = shiftClicksSubject.hide()
+
+    fun updateShifts(newShifts: List<Shift>) {
+        val shifts = newShifts.toMutableList()
         val adapterItems = mutableListOf<AdapterItem>()
+
+        // If there is an ongoing shift add it along with a header to the top of the adapter items
+        val currentShift = shifts.firstOrNull { it.end.isNullOrBlank() }
+        if (currentShift != null) {
+            adapterItems.add(AdapterItem.HeaderItem(context.getString(R.string.current_shift)))
+            adapterItems.add(AdapterItem.ShiftItem(currentShift))
+            shifts.remove(currentShift)
+        }
+
+        // Add the rest of the shifts to the adapter items
         adapterItems.add(AdapterItem.HeaderItem(context.getString(R.string.past_shifts)))
         adapterItems.addAll(shifts.map { AdapterItem.ShiftItem(it) })
         this.adapterItems = adapterItems
@@ -23,7 +39,11 @@ class ShiftsAdapter(private val context: Context): RecyclerView.Adapter<Recycler
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             AdapterItemType.Header.ordinal -> object: RecyclerView.ViewHolder(ShiftHeaderView(parent.context)) {}
-            AdapterItemType.Shift.ordinal -> object: RecyclerView.ViewHolder(ShiftView(parent.context)) {}
+            AdapterItemType.Shift.ordinal -> {
+                val shiftView = ShiftView(parent.context)
+                shiftView.clicks.subscribe { shiftClicksSubject.onNext(it) }
+                object: RecyclerView.ViewHolder(shiftView) {}
+            }
             else -> throw IllegalArgumentException("Unexpected view type")
         }
     }
