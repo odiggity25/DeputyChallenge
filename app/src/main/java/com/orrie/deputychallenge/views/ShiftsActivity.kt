@@ -1,24 +1,28 @@
 package com.orrie.deputychallenge.views
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.orrie.deputychallenge.DeputyChallengeApplication
 import com.orrie.deputychallenge.R
-import com.orrie.deputychallenge.apis.ShiftsApi
 import com.orrie.deputychallenge.repositories.ShiftsRepository
+import com.orrie.deputychallenge.viewmodels.ShiftsViewModel
 import javax.inject.Inject
 
-class ShiftsActivity : AppCompatActivity() {
+class ShiftsActivity : BaseActivity() {
 
     @Inject
     lateinit var shiftsRepository: ShiftsRepository
 
-    @Inject
-    lateinit var shiftsApi: ShiftsApi
+    lateinit var shiftsViewModel: ShiftsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shifts)
         DeputyChallengeApplication.appComponent.inject(this)
+
+        initUi()
+    }
+
+    private fun initUi() {
+        shiftsViewModel = ShiftsViewModel(shiftsRepository, exits)
     }
 }
