@@ -3,4 +3,5 @@
     <string name="start_time">Start: %s</string>
     <string name="end_time">End: %s</string>
     <string name="past_shifts">Past Shifts</string>
+    <string name="add_shift">Add Shift</string>
 </resources>

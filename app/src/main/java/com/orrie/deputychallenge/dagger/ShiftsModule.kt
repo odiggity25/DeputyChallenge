@@ -18,7 +18,9 @@ class ShiftsModule {
 
     @Provides
     @Singleton
-    fun providesShiftsRepository(shiftsApi: ShiftsApi): ShiftsRepository {
+    fun providesShiftsRepository(
+        shiftsApi: ShiftsApi
+    ): ShiftsRepository {
         return ShiftsRepository(shiftsApi)
     }
 }
