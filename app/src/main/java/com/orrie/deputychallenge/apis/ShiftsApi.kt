@@ -10,13 +10,13 @@ import retrofit2.http.POST
 
 interface ShiftsApi {
 
-    @GET("/shifts")
+    @GET("shifts")
     fun getShifts(): Single<List<Shift>>
 
-    @POST("/shift/start")
+    @POST("shift/start")
     fun startShift(@Body shiftChange: ShiftChange): Completable
 
-    @POST("/shift/end")
+    @POST("shift/end")
     fun endShift(@Body shiftChange: ShiftChange): Completable
 
 }

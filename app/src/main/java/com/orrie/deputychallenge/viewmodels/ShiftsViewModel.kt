@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.orrie.deputychallenge.models.Shift
 import com.orrie.deputychallenge.models.ShiftChange
 import com.orrie.deputychallenge.repositories.ShiftsRepository
+import com.orrie.deputychallenge.utils.DateUtils
 import com.orrie.deputychallenge.utils.LocationManager
 import com.orrie.deputychallenge.utils.autoDispose
 import io.reactivex.Observable
@@ -15,7 +16,8 @@ import timber.log.Timber
 class ShiftsViewModel(
     private val shiftsRepository: ShiftsRepository,
     private val locationManager: LocationManager,
-    private val exits: Observable<Unit>
+    private val exits: Observable<Unit>,
+    private val dateUtils: DateUtils = DateUtils()
 ) {
 
     private var shifts = listOf<Shift>()
@@ -96,7 +98,8 @@ class ShiftsViewModel(
     private fun buildShiftChangeFromCurrentLocationAndTime(): Single<ShiftChange> {
         return locationManager.getLocation()
             .map { location ->
-                ShiftChange("May 10, 1988", location.latitude.toString(), location.longitude.toString())
+                val currentDate = dateUtils.getCurrentDateString()
+                ShiftChange(currentDate, location.latitude.toString(), location.longitude.toString())
             }
             .doOnError {
                 if (it is SecurityException) {
@@ -116,32 +119,5 @@ class ShiftsViewModel(
             }, {
                 Timber.e(it, "Failed to retrieve shifts")
             }).autoDispose(exits)
-
-
-        val shift1 = Shift(
-            1,
-            "May 3, 2018",
-            "May 4, 2018",
-            23.00F,
-            24.00F,
-            23.00F,
-            24.00F,
-            "https://unsplash.it/500/500/?random"
-        )
-        val shift2 = Shift(
-            1,
-            "May 5, 2018",
-            "May 5, 2018",
-            23.00F,
-            24.00F,
-            23.00F,
-            24.00F,
-            "https://unsplash.it/500/500/?random"
-        )
-        val shift3 = Shift(3, "May 5, 2018", "", 23.00F, 24.00F, 23.00F, 24.00F, "https://unsplash.it/500/500/?random")
-
-        this.shifts = listOf(shift1, shift2, shift3)
-
-        shiftsUpdatesSubject.onNext(shifts)
     }
 }

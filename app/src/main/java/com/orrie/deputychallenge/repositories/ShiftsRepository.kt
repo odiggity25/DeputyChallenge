@@ -10,8 +10,6 @@ class ShiftsRepository(
     private val shiftsApi: ShiftsApi
 ) {
 
-    var cachedShifts: MutableList<Shift>? = null
-
     fun getShifts(): Single<List<Shift>> {
         return shiftsApi.getShifts()
     }
