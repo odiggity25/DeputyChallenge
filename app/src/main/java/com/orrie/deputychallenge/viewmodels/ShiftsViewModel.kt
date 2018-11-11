@@ -1,23 +1,18 @@
 package com.orrie.deputychallenge.viewmodels
 
-import android.annotation.SuppressLint
 import com.orrie.deputychallenge.models.Shift
-import com.orrie.deputychallenge.models.ShiftChange
 import com.orrie.deputychallenge.repositories.ShiftsRepository
-import com.orrie.deputychallenge.utils.DateUtils
-import com.orrie.deputychallenge.utils.LocationManager
+import com.orrie.deputychallenge.utils.ShiftUtils
 import com.orrie.deputychallenge.utils.autoDispose
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 
 class ShiftsViewModel(
     private val shiftsRepository: ShiftsRepository,
-    private val locationManager: LocationManager,
     private val exits: Observable<Unit>,
-    private val dateUtils: DateUtils = DateUtils()
+    private val shiftUtils: ShiftUtils
 ) {
 
     private var shifts = listOf<Shift>()
@@ -26,7 +21,7 @@ class ShiftsViewModel(
     val requestLocationPermissionShows: Observable<Unit> = requestLocationPermissionShowsSubject.hide()
 
     private val shiftsUpdatesSubject = BehaviorSubject.create<List<Shift>>()
-    val shiftsUpdates = shiftsUpdatesSubject.hide()
+    val shiftsUpdates: Observable<List<Shift>> = shiftsUpdatesSubject.hide()
 
     private val loadingVisibilityChangesSubject = BehaviorSubject.create<Boolean>()
     val loadVisibilityChanges: Observable<Boolean> = loadingVisibilityChangesSubject.hide()
@@ -40,24 +35,23 @@ class ShiftsViewModel(
     private val errorShowsSubject = PublishSubject.create<String>()
     val errorShows: Observable<String> = errorShowsSubject.hide()
 
-    private val cantStartNewShiftWhileShiftInProgressErrorShowsSubject = PublishSubject.create<Unit>()
-    val cantStartNewShiftWhileShiftInProgressErrorShows: Observable<Unit> =
-        cantStartNewShiftWhileShiftInProgressErrorShowsSubject.hide()
+    private val shiftInProgressErrorShowsSubject = PublishSubject.create<Unit>()
+    val shiftInProgressErrorShows: Observable<Unit> = shiftInProgressErrorShowsSubject.hide()
 
     init {
         updateShifts()
     }
 
     fun addShiftClicked() {
-        if (shifts.firstOrNull { it.end.isNullOrBlank() } != null) {
-            cantStartNewShiftWhileShiftInProgressErrorShowsSubject.onNext(Unit)
+        if (shiftInProgress()) {
+            shiftInProgressErrorShowsSubject.onNext(Unit)
         } else {
             shiftStartConfirmsSubject.onNext(Unit)
         }
     }
 
-    fun addShift() {
-        buildShiftChangeFromCurrentLocationAndTime()
+    fun confirmAddShiftClicked() {
+        shiftUtils.buildShiftChangeFromCurrentLocationAndTime()
             .doOnSubscribe { loadingVisibilityChangesSubject.onNext(true) }
             .doAfterTerminate { loadingVisibilityChangesSubject.onNext(false) }
             .flatMapCompletable { shiftsRepository.startShift(it) }
@@ -80,8 +74,8 @@ class ShiftsViewModel(
         }
     }
 
-    fun endShift() {
-        buildShiftChangeFromCurrentLocationAndTime()
+    fun confirmEndShiftClicked() {
+        shiftUtils.buildShiftChangeFromCurrentLocationAndTime()
             .doOnSubscribe { loadingVisibilityChangesSubject.onNext(true) }
             .doAfterTerminate { loadingVisibilityChangesSubject.onNext(false) }
             .flatMapCompletable { shiftsRepository.endShift(it) }
@@ -90,22 +84,16 @@ class ShiftsViewModel(
                 updateShifts()
             }, { error ->
                 Timber.e(error, "Failed to end shift")
-                error.message?.let { errorShowsSubject.onNext(it) }
+                if (error is SecurityException) {
+                    requestLocationPermissionShowsSubject.onNext(Unit)
+                } else {
+                    error.message?.let { errorShowsSubject.onNext(it) }
+                }
             }).autoDispose(exits)
     }
 
-    @SuppressLint("CheckResult")
-    private fun buildShiftChangeFromCurrentLocationAndTime(): Single<ShiftChange> {
-        return locationManager.getLocation()
-            .map { location ->
-                val currentDate = dateUtils.getCurrentDateString()
-                ShiftChange(currentDate, location.latitude.toString(), location.longitude.toString())
-            }
-            .doOnError {
-                if (it is SecurityException) {
-                    requestLocationPermissionShowsSubject.onNext(Unit)
-                }
-            }
+    private fun shiftInProgress(): Boolean {
+        return shifts.firstOrNull { it.end.isNullOrBlank() } != null
     }
 
     private fun updateShifts() {

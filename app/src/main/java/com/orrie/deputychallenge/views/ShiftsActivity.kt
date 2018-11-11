@@ -16,7 +16,7 @@ import com.orrie.deputychallenge.DeputyChallengeApplication
 import com.orrie.deputychallenge.R
 import com.orrie.deputychallenge.adapters.ShiftsAdapter
 import com.orrie.deputychallenge.repositories.ShiftsRepository
-import com.orrie.deputychallenge.utils.LocationManager
+import com.orrie.deputychallenge.utils.ShiftUtils
 import com.orrie.deputychallenge.utils.dpToPx
 import com.orrie.deputychallenge.utils.subscribeAndObserveOnMainThread
 import com.orrie.deputychallenge.viewmodels.ShiftsViewModel
@@ -31,7 +31,7 @@ class ShiftsActivity : BaseActivity() {
     lateinit var shiftsRepository: ShiftsRepository
 
     @Inject
-    lateinit var locationManager: LocationManager
+    lateinit var shiftUtils: ShiftUtils
 
     lateinit var shiftsViewModel: ShiftsViewModel
 
@@ -49,7 +49,7 @@ class ShiftsActivity : BaseActivity() {
         setSupportActionBar(shiftsToolbar)
         supportActionBar?.title = "Deputy Challenge"
 
-        shiftsViewModel = ShiftsViewModel(shiftsRepository, locationManager, exits)
+        shiftsViewModel = ShiftsViewModel(shiftsRepository, exits, shiftUtils)
 
         val shiftsAdapter = ShiftsAdapter(this)
         shiftsRecyclerView.adapter = shiftsAdapter
@@ -67,7 +67,7 @@ class ShiftsActivity : BaseActivity() {
         shiftsViewModel.loadVisibilityChanges.subscribeAndObserveOnMainThread {
             shiftsProgressBar.visibility = if (it) View.VISIBLE else View.GONE
         }
-        shiftsViewModel.cantStartNewShiftWhileShiftInProgressErrorShows.subscribeAndObserveOnMainThread { showCantStartNewShiftDialog() }
+        shiftsViewModel.shiftInProgressErrorShows.subscribeAndObserveOnMainThread { showCantStartNewShiftDialog() }
         shiftsViewModel.shiftStartConfirms.subscribeAndObserveOnMainThread { showNewShiftConfirmationDialog() }
         shiftsViewModel.shiftEndConfirms.subscribeAndObserveOnMainThread { showEndShiftConfirmationDialog() }
         shiftsViewModel.errorShows.subscribeAndObserveOnMainThread { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
@@ -88,7 +88,7 @@ class ShiftsActivity : BaseActivity() {
         alertDialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.start_shift))
             .setMessage(getString(R.string.start_shift_explanation))
-            .setPositiveButton(getString(R.string.ok)) { _, _ -> shiftsViewModel.addShift() }
+            .setPositiveButton(getString(R.string.ok)) { _, _ -> shiftsViewModel.confirmAddShiftClicked() }
             .setNegativeButton(getString(R.string.cancel), null)
             .create()
         alertDialog?.show()
@@ -99,7 +99,7 @@ class ShiftsActivity : BaseActivity() {
         alertDialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.end_shift))
             .setMessage(getString(R.string.end_shift_explanation))
-            .setPositiveButton(getString(R.string.ok)) { _, _ -> shiftsViewModel.endShift() }
+            .setPositiveButton(getString(R.string.ok)) { _, _ -> shiftsViewModel.confirmEndShiftClicked() }
             .setNegativeButton(getString(R.string.cancel), null)
             .create()
         alertDialog?.show()
