@@ -36,10 +36,10 @@ OkHttp logging interceptor for debugging network calls: https://github.com/bumpt
 1. What is important to you in your career?  
 There are two main things that are important to me. Firstly, that I am working on the solution to a problem that not only interests me but also has a positive effect on large number of people. Secondly, that I am continually challenged and presented with opportunities to grow and learn. 
 
-2. What excites you about Deputy and the opportunity?
+2. What excites you about Deputy and the opportunity?  
 Again, there are two main reasons why I am excited about working at Deputy. Firstly, it fulfills what I am looking for from question 1. Having worked in shift work in the past, it is a relatable problem Deputy is trying to solve that I am very much interested in, and also solving this problem can potentially positively benefit an enormous number of people. Secondly, I have worked at a similar sized company before and I think it is a really fun period to be a part of. At Deputy’s size with funding secured, it is a stable place to work with many processes already in place to make things run efficiently, however it is still small enough things get shipped quickly and my work can have a huge impact. 
 
-3. What would you like us to know about you? 
+3. What would you like us to know about you?  
 With almost 8 years in Android development I have a very strong technical background and having worked for companies serving millions of customers I have a lot of experience building solutions that scale. Additionally, having worked as team lead for several years, my communication skills are excellent. Whether this is giving feedback to peers, working with product managers on the next feature, or giving updates to the entire company. I’m also very social and enjoy organizing and participating in after work events to get to know my peers better. 
 
 
