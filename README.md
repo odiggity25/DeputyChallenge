@@ -26,9 +26,9 @@ Timber for easy logging (no more TAGs everywhere): https://github.com/JakeWharto
 RxJava and RxAndroid for simplify asynchronous code and scheduling: https://github.com/ReactiveX/RxAndroid  
 RxBinding to easily use RxJava with Android's native widgets: https://github.com/JakeWharton/RxBinding  
 Retrofit along with RxJava adapters and gson converter for making network calls and automatically converting them to observables emitting the correct data classes: https://square.github.io/retrofit/  
-Dagger for dependency injection: https://google.github.io/dagger/android.html
-Glide for image loading: https://github.com/bumptech/glide
-OkHttp logging interceptor for debugging network calls: https://github.com/bumptech/glide
+Dagger for dependency injection: https://google.github.io/dagger/android.html  
+Glide for image loading: https://github.com/bumptech/glide  
+OkHttp logging interceptor for debugging network calls: https://github.com/bumptech/glide  
 
 
 <b>Part 2</b>
