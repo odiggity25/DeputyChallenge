@@ -6,6 +6,11 @@ import com.orrie.deputychallenge.models.ShiftChange
 import io.reactivex.Completable
 import io.reactivex.Single
 
+/**
+ * The repository that manages the shifts. In this simple example it is not
+ * that useful, however if we were to add caching or a database layer this would
+ * co-ordinate that
+ */
 class ShiftsRepository(
     private val shiftsApi: ShiftsApi
 ) {

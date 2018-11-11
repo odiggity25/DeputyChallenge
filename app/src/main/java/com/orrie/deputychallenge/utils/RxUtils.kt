@@ -25,10 +25,6 @@ fun <T> Observable<T>.subscribeAndObserveOnMainThread(onNext: (t: T) -> Unit): D
             .subscribe(onNext)
 }
 
-fun <T> SingleEmitter<T>.onSafeSuccess(t: T) {
-    if (!isDisposed) onSuccess(t)
-}
-
 fun <T> SingleEmitter<T>.onSafeError(throwable: Throwable) {
     if (!isDisposed) onError(throwable)
 }

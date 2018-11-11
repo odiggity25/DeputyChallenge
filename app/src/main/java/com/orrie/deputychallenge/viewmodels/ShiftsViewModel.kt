@@ -5,6 +5,7 @@ import com.orrie.deputychallenge.repositories.ShiftsRepository
 import com.orrie.deputychallenge.utils.ShiftUtils
 import com.orrie.deputychallenge.utils.autoDispose
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
@@ -52,6 +53,7 @@ class ShiftsViewModel(
 
     fun confirmAddShiftClicked() {
         shiftUtils.buildShiftChangeFromCurrentLocationAndTime()
+            .subscribeOn(Schedulers.io())
             .doOnSubscribe { loadingVisibilityChangesSubject.onNext(true) }
             .doAfterTerminate { loadingVisibilityChangesSubject.onNext(false) }
             .flatMapCompletable { shiftsRepository.startShift(it) }
@@ -76,6 +78,7 @@ class ShiftsViewModel(
 
     fun confirmEndShiftClicked() {
         shiftUtils.buildShiftChangeFromCurrentLocationAndTime()
+            .subscribeOn(Schedulers.io())
             .doOnSubscribe { loadingVisibilityChangesSubject.onNext(true) }
             .doAfterTerminate { loadingVisibilityChangesSubject.onNext(false) }
             .flatMapCompletable { shiftsRepository.endShift(it) }

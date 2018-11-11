@@ -11,7 +11,7 @@ class ShiftUtils(
     fun buildShiftChangeFromCurrentLocationAndTime(): Single<ShiftChange> {
         return locationManager.getLocation()
             .map { location ->
-                val currentDate = dateUtils.getCurrentDateString()
+                val currentDate = dateUtils.getCurrentDateStringInIso8601()
                 ShiftChange(currentDate, location.latitude.toString(), location.longitude.toString())
             }
     }

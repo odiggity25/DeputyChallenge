@@ -10,6 +10,9 @@ import com.orrie.deputychallenge.views.ShiftView
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
+/**
+ * This is the adapter used to show shifts and headers in the shifts recycler view
+ */
 class ShiftsAdapter(private val context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var adapterItems: List<AdapterItem> = listOf()
