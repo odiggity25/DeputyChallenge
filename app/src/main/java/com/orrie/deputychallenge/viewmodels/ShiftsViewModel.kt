@@ -35,8 +35,8 @@ class ShiftsViewModel(
     private val shiftEndConfirmsSubject = PublishSubject.create<Unit>()
     val shiftEndConfirms: Observable<Unit> = shiftEndConfirmsSubject.hide()
 
-    private val locationErrorShowsSubject = PublishSubject.create<Unit>()
-    val locationErrorShows: Observable<Unit> = locationErrorShowsSubject.hide()
+    private val errorShowsSubject = PublishSubject.create<String>()
+    val errorShows: Observable<String> = errorShowsSubject.hide()
 
     private val cantStartNewShiftWhileShiftInProgressErrorShowsSubject = PublishSubject.create<Unit>()
     val cantStartNewShiftWhileShiftInProgressErrorShows: Observable<Unit> =
@@ -62,10 +62,12 @@ class ShiftsViewModel(
             .subscribe({
                 Timber.d("Successfully started shift")
                 updateShifts()
-            }, {
-                Timber.e(it, "Failed to start shift")
-                if (it is SecurityException) {
+            }, { error ->
+                Timber.e(error, "Failed to start shift")
+                if (error is SecurityException) {
                     requestLocationPermissionShowsSubject.onNext(Unit)
+                } else {
+                    error.message?.let { errorShowsSubject.onNext(it) }
                 }
             }).autoDispose(exits)
     }
@@ -84,8 +86,9 @@ class ShiftsViewModel(
             .subscribe({
                 Timber.d("Successfully ended shift")
                 updateShifts()
-            }, {
-                Timber.e(it, "Failed to end shift")
+            }, { error ->
+                Timber.e(error, "Failed to end shift")
+                error.message?.let { errorShowsSubject.onNext(it) }
             }).autoDispose(exits)
     }
 

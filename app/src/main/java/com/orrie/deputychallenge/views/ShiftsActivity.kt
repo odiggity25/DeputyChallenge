@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.orrie.deputychallenge.DeputyChallengeApplication
@@ -69,6 +70,7 @@ class ShiftsActivity : BaseActivity() {
         shiftsViewModel.cantStartNewShiftWhileShiftInProgressErrorShows.subscribeAndObserveOnMainThread { showCantStartNewShiftDialog() }
         shiftsViewModel.shiftStartConfirms.subscribeAndObserveOnMainThread { showNewShiftConfirmationDialog() }
         shiftsViewModel.shiftEndConfirms.subscribeAndObserveOnMainThread { showEndShiftConfirmationDialog() }
+        shiftsViewModel.errorShows.subscribeAndObserveOnMainThread { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
     }
 
     private fun showCantStartNewShiftDialog() {
@@ -76,7 +78,7 @@ class ShiftsActivity : BaseActivity() {
         alertDialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.shift_in_progress))
             .setMessage(getString(R.string.shift_in_progress_explanation))
-            .setPositiveButton("OK", null)
+            .setPositiveButton(getString(R.string.ok), null)
             .create()
         alertDialog?.show()
     }
@@ -95,8 +97,8 @@ class ShiftsActivity : BaseActivity() {
     private fun showEndShiftConfirmationDialog() {
         alertDialog?.dismiss()
         alertDialog = AlertDialog.Builder(this)
-            .setTitle("End Shift")
-            .setMessage("Would you like to end this shift?")
+            .setTitle(getString(R.string.end_shift))
+            .setMessage(getString(R.string.end_shift_explanation))
             .setPositiveButton(getString(R.string.ok)) { _, _ -> shiftsViewModel.endShift() }
             .setNegativeButton(getString(R.string.cancel), null)
             .create()
