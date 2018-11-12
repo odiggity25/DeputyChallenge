@@ -1,6 +1,6 @@
 # DeputyChallenge
 
-![](https://imgur.com/3Mw25WU)
+![](https://imgur.com/3Mw25WU.png)
 
 This is my (Orrie Shannon's) submission to the Deputy Coding Challenge.
 
